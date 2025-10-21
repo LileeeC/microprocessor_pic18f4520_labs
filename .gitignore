@@ -1,0 +1,4 @@
+# MPLAB X IDE generated files
+build/
+dist/
+nbproject/private/

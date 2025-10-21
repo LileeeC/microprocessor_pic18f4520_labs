@@ -1,0 +1,280 @@
+List p=18f4520
+    #include<p18f4520.inc>
+	CONFIG OSC = INTIO67
+	CONFIG WDT = OFF
+	org 0x000
+	
+	IN_BASE EQU 0x300
+	OUT_BASE EQU 0x320
+	HIGH_BASE EQU 0x340
+	LOW_BASE EQU 0x350
+	
+	CNT EQU 0x29
+	TMP EQU 0x2A
+ 
+	I EQU 0x20 ;outer loop
+	J EQU 0x21 ;inner loop
+	PairCNT EQU 0x22
+	Hi EQU 0x23
+	Li EQU 0x24
+	Hj EQU 0x25
+	Lj EQU 0x26
+	Bi EQU 0x27
+	Bj EQU 0x28
+	USED_BASE EQU 0x30 ;USED[0..7]
+	L_BASE EQU 0x40 ;L[0..3]
+	R_BASE EQU 0x44 ;R[0..3]
+
+	LFSR 0, IN_BASE
+	MOVLW 0xC4
+	MOVWF POSTINC0
+	MOVLW 0xBB
+	MOVWF POSTINC0
+	MOVLW 0xBB
+	MOVWF POSTINC0
+	MOVLW 0x00
+	MOVWF POSTINC0
+	MOVLW 0x4C
+	MOVWF POSTINC0
+	MOVLW 0x8B
+	MOVWF POSTINC0
+	MOVLW 0xBB
+	MOVWF POSTINC0
+	MOVLW 0x00
+	MOVWF POSTINC0
+	LFSR 0, IN_BASE
+	LFSR 1, HIGH_BASE
+	LFSR 2, LOW_BASE
+	MOVLW 8
+	MOVWF CNT
+Splitloop:
+	;0x63 -> (6, 3)
+	;(a, b) (b, a) / (x, x) (x, x)
+	MOVF INDF0, W ;W = [FSR0] = 0x63
+	MOVWF TMP ;TMP = 0x63
+	
+	SWAPF TMP, W ;W = 0x36
+	ANDLW 0x0F ;get high = 0x06
+	MOVWF POSTINC1 ;save to highs[], FSR1++
+	
+	MOVF TMP, W ;W = 0x63
+	ANDLW 0x0F ;get low = 0x03
+	MOVWF POSTINC2 ;save to lows[], FSR2++
+	
+	MOVF POSTINC0, W
+	DECFSZ CNT, f
+	BRA Splitloop
+PairI:
+	;end if i >= 8
+	MOVLW 8
+	CPFSLT I ;compare f with W, skip if f < W
+	BRA PairDone
+	
+	;skip used i
+	LFSR 2, USED_BASE
+	MOVF I, W
+	MOVF PLUSW2, W ;W = USED[i]
+	BNZ PairNextI ;if USED[i] != 0 then next i
+	
+	;get ith (Hi, Li)
+	LFSR 0, HIGH_BASE ;point to 0x06
+	MOVF I, W ;W = i
+	MOVF PLUSW0, W ;W = 0x63 + W
+	MOVWF Hi ;Hi = W
+	
+	LFSR 0, LOW_BASE
+	MOVF I, W
+	MOVF PLUSW0, W
+	MOVWF Li
+	
+	;j=i+1
+	MOVF I, W
+	ADDLW 1
+	MOVWF J
+PairJ:
+	;if j>= 8 then next i
+	MOVLW 8
+	CPFSLT J
+	BRA PairNextI
+	
+	;skip used j
+	LFSR 2, USED_BASE
+	MOVF J, W
+	MOVF PLUSW2, W
+	BNZ PairNextJ
+	
+	;get jth (Hj, Lj)
+	LFSR 0, HIGH_BASE
+	MOVF J, W
+	MOVF PLUSW0, W
+	MOVWF Hj
+	
+	LFSR 0, LOW_BASE
+	MOVF J, W
+	MOVF PLUSW0, W
+	MOVWF Lj
+	
+	;whether Hi == Lj and Hj == Li
+	MOVF Hi, W
+	CPFSEQ Lj ;compare f with W, skip if f=W
+	BRA PairNextJ
+	MOVF Li, W
+	CPFSEQ Hj
+	BRA PairNextJ
+	
+	;find a pair -> the smaller one on the left
+	;if Hi <= Li then ith on the left
+	LFSR 1, IN_BASE
+	MOVF I, W
+	MOVF PLUSW1, W
+	MOVWF Bi ;Bi = input[i]
+	
+	LFSR 1, IN_BASE
+	MOVF J, W
+	MOVF PLUSW1, W
+	MOVWF Bj ;Bj = input[j]
+	
+	MOVF Hi, W
+	CPFSLT Li ;skip if Li < Hi (means j on the left)
+	BRA PairLeftI
+PairLeftJ:
+	LFSR 1, L_BASE
+	MOVF PairCNT, W ;W = paircnt
+	MOVFF Bj, PLUSW1 ;Bj = L[paircnt] since FSR1 = FSR1+W
+	
+	LFSR 1, R_BASE
+	MOVF PairCNT, W
+	MOVFF Bi, PLUSW1 ;Bi = R[paircnt]
+	
+	BRA PairStoreDone
+PairLeftI:
+	LFSR 1, L_BASE 
+	MOVF PairCNT, W 
+	MOVFF Bi, PLUSW1 ;Bi = L[paircnt]
+	
+	LFSR 1, R_BASE
+	MOVF PairCNT, W
+	MOVFF Bj, PLUSW1 ;Bj = R[paircnt]
+	
+	BRA PairStoreDone
+PairStoreDone:
+	;mark USED[i] = USED[j] = 1
+	LFSR 2, USED_BASE ;FSR2 point to USED[0]
+	MOVLW 0x01 ;W = 1
+	MOVWF TMP
+	MOVF I, W ;W = I -> UsED[i]	
+	MOVFF TMP, PLUSW2 ;USED[i] = 1
+	
+	LFSR 2, USED_BASE
+	MOVF J, W
+	MOVFF TMP, PLUSW2
+	
+	INCF PairCNT, f ;pair count++
+	BRA PairNextI
+PairNextJ:
+	INCF J, f ;j++
+	BRA PairJ
+PairNextI:
+	INCF I, f ;i++
+	BRA PairI
+PairDone:
+	;pair fail
+	MOVLW 4
+	CPFSEQ PairCNT
+	BRA Fail
+	;sort: if left > right, then swap
+	MOVF L_BASE+0, W
+	CPFSLT L_BASE+1
+	BRA L01NoSwap
+	; swap L0 <-> L1
+	MOVFF L_BASE+0, TMP
+	MOVFF L_BASE+1, L_BASE+0
+	MOVFF TMP, L_BASE+1
+	; swap R0 <-> R1
+	MOVFF R_BASE+0, TMP
+	MOVFF R_BASE+1, R_BASE+0
+	MOVFF TMP, R_BASE+1
+L01NoSwap:
+	MOVF L_BASE+1, W, ACCESS
+	CPFSLT L_BASE+2
+	BRA L12NoSwap
+	; swap L1 <-> L2
+	MOVFF L_BASE+1, TMP
+	MOVFF L_BASE+2, L_BASE+1
+	MOVFF TMP, L_BASE+2
+	; swap R1 <-> R2
+	MOVFF R_BASE+1, TMP
+	MOVFF R_BASE+2, R_BASE+1
+	MOVFF TMP, R_BASE+2
+L12NoSwap:
+	MOVF L_BASE+2, W
+	CPFSLT L_BASE+3
+	BRA L23NoSwap
+	; swap L2 <-> L3
+	MOVFF L_BASE+2, TMP
+	MOVFF L_BASE+3, L_BASE+2
+	MOVFF TMP, L_BASE+3
+	; swap R2 <-> R3
+	MOVFF R_BASE+2, TMP
+	MOVFF R_BASE+3, R_BASE+2
+	MOVFF TMP, R_BASE+3
+L23NoSwap:
+	;sort (L0, L1) and (L1, L2) again
+	MOVF L_BASE+0, W, ACCESS
+	CPFSLT L_BASE+1
+	BRA L01bNoSwap
+	; swap L0 <-> L1
+	MOVFF L_BASE+0, TMP
+	MOVFF L_BASE+1, L_BASE+0
+	MOVFF TMP, L_BASE+1
+	; swap R0 <-> R1
+	MOVFF R_BASE+0, TMP
+	MOVFF R_BASE+1, R_BASE+0
+	MOVFF TMP, R_BASE+1
+L01bNoSwap:
+	MOVF  L_BASE+1, W, ACCESS
+	CPFSLT L_BASE+2
+	BRA L12bNoSwap
+	; swap L1 <-> L2
+	MOVFF L_BASE+1, TMP
+	MOVFF L_BASE+2, L_BASE+1
+	MOVFF TMP, L_BASE+2
+	; swap R1 <-> R2
+	MOVFF R_BASE+1, TMP
+	MOVFF R_BASE+2, R_BASE+1
+	MOVFF TMP, R_BASE+2
+L12bNoSwap:
+	LFSR 0, OUT_BASE
+
+	MOVF L_BASE+0, W, ACCESS
+	MOVWF POSTINC0
+	MOVF L_BASE+1, W, ACCESS
+	MOVWF POSTINC0
+	MOVF L_BASE+2, W, ACCESS
+	MOVWF POSTINC0
+	MOVF L_BASE+3, W, ACCESS
+	MOVWF POSTINC0
+
+	MOVF R_BASE+3, W, ACCESS
+	MOVWF POSTINC0
+	MOVF R_BASE+2, W, ACCESS
+	MOVWF POSTINC0
+	MOVF R_BASE+1, W, ACCESS
+	MOVWF POSTINC0
+	MOVF R_BASE+0, W, ACCESS
+	MOVWF POSTINC0
+	
+	BRA Done
+Fail:
+	LFSR 0, OUT_BASE
+	MOVLW 0xFF
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+	MOVWF POSTINC0
+Done:
+end
