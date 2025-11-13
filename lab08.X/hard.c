@@ -29,7 +29,7 @@
 // 64 * 81.9ms ? 5.2 ? (approximately 5 seconds)
 #define TIMER_TARGET 10
 
-volatile char isRunning = 0;
+volatile char isRunning = 0; // main??ISR???
 volatile signed int current;
 volatile signed char dir = 1;
 volatile unsigned char timer_counter = 0; // ??????
@@ -40,14 +40,21 @@ void set_motor_led(unsigned int value){
     CCP1CONbits.DC1B = value & 0x03; // CCP1 ????????????????
     
     // CCP2 (LED)
+    unsigned int led;
+    unsigned int input;
+    input = value - NEG_90; 
+    
+    // led_value = input_offset * 19.5
+    // ??????????? (x * 19) + (x / 2)
+    led = (input * 19) + (input >> 1);
     CCPR2L = value >> 2;
     CCP2CONbits.DC2B0 = (value & 0x01); // ???
     CCP2CONbits.DC2B1 = (value & 0x02) >> 1; //????
 }
 
 void __interrupt() ISR(void){ // ?? XC8 ??
-    // ????? Timer0 ????
-    if (INTCONbits.TMR0IF){
+    // ?? ISR ???????????
+    if (INTCONbits.TMR0IF){ // Timer0 overflow ???????bit??1
         timer_counter++;
 
         if (timer_counter >= TIMER_TARGET){
@@ -71,7 +78,6 @@ void __interrupt() ISR(void){ // ?? XC8 ??
         INTCONbits.TMR0IF = 0;
     }
 }
-
 
 void main(void){
     // Timer2 -> On, prescaler -> 4 
@@ -101,35 +107,27 @@ void main(void){
     T0CONbits.TMR0ON = 1; // Timer0 On
     T0CONbits.T08BIT = 1; // 8-bit mode
     T0CONbits.T0CS = 0;   // Clock source = Fosc/4
-    T0CONbits.PSA = 1;    // Bypass prescaler
+    T0CONbits.PSA = 1;    // Bypass prescaler off
     
     INTCONbits.TMR0IE = 1; // ?? Timer0 ????
-    INTCONbits.GIE = 1;    // ??????
+    INTCONbits.GIE = 1;    // ???????
     
     current = NEG_90;
     set_motor_led(current);
-    
-    char buttonWasPressed = 0; // ????????
+    char pressed = 0;
 
-    while(1)
-    {
-        // ?? "??"
-        if (PORTBbits.RB0 == 0)
-        {
+    while(1){
+        if (PORTBbits.RB0 == 0){ // pressed
             __delay_ms(20);
-            if (PORTBbits.RB0 == 0)
-            {
-                buttonWasPressed = 1;
+            if (PORTBbits.RB0 == 0){
+                pressed = 1;
             }
         }
-        // ?? "??" (???)
-        else if (buttonWasPressed == 1 && PORTBbits.RB0 == 1)
-        {
+        else if (pressed == 1 && PORTBbits.RB0 == 1){ // unpressed
             __delay_ms(20);
-            if (PORTBbits.RB0 == 1)
-            {
-                isRunning = !isRunning; // ????/????
-                buttonWasPressed = 0;
+            if (PORTBbits.RB0 == 1){
+                isRunning = !isRunning; 
+                pressed = 0;
             }
         }
     }
