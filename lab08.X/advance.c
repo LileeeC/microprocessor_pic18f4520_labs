@@ -17,12 +17,12 @@
 
 #define _XTAL_FREQ 125000 // ???? Fosc (Hz), for __delay_ms()
 
-#define NEG_90 31  // -90 ? (10-bit value)
-#define POS_90 63  // +90 ? (10-bit value)
+#define NEG_90 15  // -90 ? (10-bit value)
+#define POS_90 80  // +90 ? (10-bit value)
 
-// ???: (63 - 31) = 32 steps
-// 135 ? = (135 / 180) * 32 steps = 24 steps
-#define STEP_135 24
+// ???: (80-15) = 65 steps
+// 135 ? = (135 / 180) * 65 steps = 48.75 steps
+#define STEP_135 48.75
 
 void set_motor_angle(unsigned int ten_bit_value){
     // Set CCPRxL and CCPxCON<5:4>

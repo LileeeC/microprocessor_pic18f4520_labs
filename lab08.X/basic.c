@@ -21,9 +21,9 @@
 // 10-bit PWM Duty cycle time resolution = (10-bit value) * Tosc * (TMR2 Prescaler)
 // 1 tick = Tosc * (TMR2 Prescaler)
 // Fosc = 125kHz, Tosc = 8탎, TMR2 Prescaler = 4 -> 1 tick = 32탎
-#define POS_NEG_90 31  // -90 ? (1000탎 / 32탎 = 31)
+#define POS_NEG_90 15  // -90 ? (1000탎 / 32탎 = 31)
 #define POS_0 45       // 0 ?   (1440탎 / 32탎 = 45)
-#define POS_POS_90 63  // +90 ? (2000탎 / 32탎 = 63)
+#define POS_POS_90 80  // +90 ? (2000탎 / 32탎 = 63)
 
 void set_motor_angle(unsigned int ten_bit_value){
     // Set CCPRxL and CCPxCON<5:4>

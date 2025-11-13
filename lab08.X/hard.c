@@ -17,17 +17,17 @@
 
 #define _XTAL_FREQ 125000 // ???? Fosc (Hz), for __delay_ms()
 
-#define NEG_90 31  // -90 ? (10-bit value)
-#define POS_90 63  // +90 ? (10-bit value)
+#define NEG_90 15  // -90 ? (10-bit value)
+#define POS_90 80  // +90 ? (10-bit value)
 
 // Timer0 ? 32 µs ?? 1 ??? 256 ??overflow???? 
 // ???? = 32 µs * 256 = 8,192 µs = 8.192ms?????????
-// (63-31)*2 = 64 ?
-// 5 ? / 64 ? = 5000 ms / 64 ? ? 78 ms/?
-// TARGET = 78 ms / 8.192 ms ? 9.52
-// ??????????? 10 * 8.192ms ? 81.9ms)
-// 64 * 81.9ms ? 5.2 ? (approximately 5 seconds)
-#define TIMER_TARGET 10
+// (75-15)*2 = 120 ?
+// 5 ? / 120 ? = 5000 ms / 120 ? ? 41.7 ms/?
+// TARGET = 41.7 ms / 8.192 ms ? 5.09
+// ??????????? 5 * 8.192ms ? 41ms
+// 120 * 41ms ? 5 ? 
+#define TIMER_TARGET 5
 
 volatile char isRunning = 0; // main??ISR???
 volatile signed int current;
@@ -44,9 +44,8 @@ void set_motor_led(unsigned int value){
     unsigned int input;
     input = value - NEG_90; 
     
-    // led_value = input_offset * 19.5
-    // ??????????? (x * 19) + (x / 2)
-    led = (input * 19) + (input >> 1);
+    // mapping ? LED ??? 0~624
+    led = input * 9;
     CCPR2L = value >> 2;
     CCP2CONbits.DC2B0 = (value & 0x01); // ???
     CCP2CONbits.DC2B1 = (value & 0x02) >> 1; //????
