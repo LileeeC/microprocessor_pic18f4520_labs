@@ -15,20 +15,20 @@
 #include <xc.h>
 #include <pic18f4520.h>
 
-#define _XTAL_FREQ 125000 // ???? Fosc (Hz), for __delay_ms()
-// ???????????????????? _XTAL_FREQ????????? 20 ????????? NOP ?????
+#define _XTAL_FREQ 125000 // 晶片時脈 Fosc (Hz), for __delay_ms()
+// 編譯器會「在編譯的當下」根據你必須提供的 _XTAL_FREQ，自動計算出要延遲 20 毫秒到底需要多少個 NOP 或其他迴圈
 
 // 10-bit PWM Duty cycle time resolution = (10-bit value) * Tosc * (TMR2 Prescaler)
 // 1 tick = Tosc * (TMR2 Prescaler)
-// Fosc = 125kHz, Tosc = 8�s, TMR2 Prescaler = 4 -> 1 tick = 32�s
-#define POS_NEG_90 15  // -90 ? (1000�s / 32�s = 31)
-#define POS_0 45       // 0 ?   (1440�s / 32�s = 45)
-#define POS_POS_90 80  // +90 ? (2000�s / 32�s = 63)
+// Fosc = 125kHz, Tosc = 8µs, TMR2 Prescaler = 4 -> 1 tick = 32µs
+#define POS_NEG_90 15  // -90 度 
+#define POS_0 45       // 0 度  
+#define POS_POS_90 80  // +90 度 
 
-void set_motor_angle(unsigned int ten_bit_value){
+void set_motor_angle(unsigned int ten_bit){
     // Set CCPRxL and CCPxCON<5:4>
-    CCPR1L = ten_bit_value >> 2; // high 8 bits
-    CCP1CONbits.DC1B = ten_bit_value & 0x03; // low 2 bits
+    CCPR1L = ten_bit >> 2; // high 8 bits
+    CCP1CONbits.DC1B = ten_bit & 0x03; // low 2 bits
 }
 
 void main(void){
@@ -36,7 +36,7 @@ void main(void){
     T2CONbits.TMR2ON = 0b1;
     T2CONbits.T2CKPS = 0b01;
 
-    // Internal Oscillator Frequency, Fosc = 125 kHz, Tosc = 8 �s
+    // Internal Oscillator Frequency, Fosc = 125 kHz, Tosc = 8 µs
     OSCCONbits.IRCF = 0b001;
     
     // PWM mode, P1A, P1C active-high; P1B, P1D active-high
@@ -52,7 +52,7 @@ void main(void){
     /*
      * PWM period
      * = (PR2 + 1) * 4 * Tosc * (TMR2 prescaler)
-     * = (0x9B + 1) * 4 * 8�s * 4
+     * = (0x9B + 1) * 4 * 8µs * 4
      * = 0.019968s ~= 20ms
      */
     PR2 = 0x9B;

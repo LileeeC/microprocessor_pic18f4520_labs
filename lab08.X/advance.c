@@ -15,32 +15,32 @@
 #include <xc.h>
 #include <pic18f4520.h>
 
-#define _XTAL_FREQ 125000 // ???? Fosc (Hz), for __delay_ms()
+#define _XTAL_FREQ 125000 // 晶片時脈 Fosc (Hz), for __delay_ms()
 
-#define NEG_90 15  // -90 ? (10-bit value)
-#define POS_90 80  // +90 ? (10-bit value)
+#define NEG_90 15  // -90 度 (10-bit value)
+#define POS_90 80  // +90 度 (10-bit value)
 
-// ???: (80-15) = 65 steps
-// 135 ? = (135 / 180) * 65 steps = 48.75 steps
-#define STEP_135 48.75
+// 總範圍: (80-15) = 65 steps
+// 135 度 = (135 / 180) * 65 steps = 48.75 steps
+#define STEP_135 49 // (我們使用整數 49)
 
-void set_motor_angle(unsigned int ten_bit_value){
+void set_motor_angle(unsigned int ten_bit){
     // Set CCPRxL and CCPxCON<5:4>
-    CCPR1L = ten_bit_value >> 2; // high 8 bits
-    CCP1CONbits.DC1B = ten_bit_value & 0x03; // low 2 bits
+    CCPR1L = ten_bit >> 2; // high 8 bits
+    CCP1CONbits.DC1B = ten_bit & 0x03; // low 2 bits
 }
 
 void move_gradually(unsigned int start, unsigned int end){
-    if (end > start){ // ??
+    if (end > start){ // 遞增
         for (unsigned int i = start; i <= end; i++){
             set_motor_angle(i);
-            __delay_ms(20); // ??????
+            __delay_ms(20); // 控制轉動速度
         }
     }
-    else{ // ??
+    else{ // 遞減
         for (unsigned int i = start; i >= end; i--){
             set_motor_angle(i);
-            __delay_ms(20); // ??????
+            __delay_ms(20); // 控制轉動速度
         }
     }
 }
@@ -50,7 +50,7 @@ void main(void){
     T2CONbits.TMR2ON = 0b1;
     T2CONbits.T2CKPS = 0b01;
 
-    // Internal Oscillator Frequency, Fosc = 125 kHz, Tosc = 8 �s
+    // Internal Oscillator Frequency, Fosc = 125 kHz, Tosc = 8 µs
     OSCCONbits.IRCF = 0b001;
     
     // PWM mode, P1A, P1C active-high; P1B, P1D active-high
@@ -67,9 +67,10 @@ void main(void){
     
     signed int current;
     signed int target;
-    signed char dir = 1; // 1 = ?+90, -1 = ?-90
+    signed char dir = 1; // 1 = 往+90, -1 = 往-90
     char pressed = 0;
     set_motor_angle(NEG_90);
+    current = NEG_90;
 
     while(1){
         if (PORTBbits.RB0 == 0){ // pressed
@@ -83,7 +84,7 @@ void main(void){
                 target = current + (dir * STEP_135);
 
                 // check boundary
-                if (target > POS_90){ // ?? +90 
+                if (target > POS_90){ // 超過 +90 
                     signed int toomuch = target - POS_90;
                     signed int final = POS_90 - toomuch;
                     
@@ -92,7 +93,7 @@ void main(void){
 
                     current = final;
                     dir = -1;
-                }else if (target < NEG_90){ // ?? -90
+                }else if (target < NEG_90){ // 超過 -90
                     signed int toomuch = NEG_90 - target;
                     signed int final = NEG_90 + toomuch;
 
