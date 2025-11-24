@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=sample.c basic.c advance.c hard.c
+SOURCEFILES_QUOTED_IF_SPACED=hard.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/sample.p1 ${OBJECTDIR}/basic.p1 ${OBJECTDIR}/advance.p1 ${OBJECTDIR}/hard.p1
-POSSIBLE_DEPFILES=${OBJECTDIR}/sample.p1.d ${OBJECTDIR}/basic.p1.d ${OBJECTDIR}/advance.p1.d ${OBJECTDIR}/hard.p1.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/hard.p1
+POSSIBLE_DEPFILES=${OBJECTDIR}/hard.p1.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/sample.p1 ${OBJECTDIR}/basic.p1 ${OBJECTDIR}/advance.p1 ${OBJECTDIR}/hard.p1
+OBJECTFILES=${OBJECTDIR}/hard.p1
 
 # Source Files
-SOURCEFILES=sample.c basic.c advance.c hard.c
+SOURCEFILES=hard.c
 
 
 CFLAGS=
@@ -93,30 +93,6 @@ MP_PROCESSOR_OPTION=18F4520
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: compile
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-${OBJECTDIR}/sample.p1: sample.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/sample.p1.d 
-	@${RM} ${OBJECTDIR}/sample.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/sample.p1 sample.c 
-	@-${MV} ${OBJECTDIR}/sample.d ${OBJECTDIR}/sample.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/sample.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/basic.p1: basic.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/basic.p1.d 
-	@${RM} ${OBJECTDIR}/basic.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/basic.p1 basic.c 
-	@-${MV} ${OBJECTDIR}/basic.d ${OBJECTDIR}/basic.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/basic.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/advance.p1: advance.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/advance.p1.d 
-	@${RM} ${OBJECTDIR}/advance.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -D__DEBUG=1  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/advance.p1 advance.c 
-	@-${MV} ${OBJECTDIR}/advance.d ${OBJECTDIR}/advance.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/advance.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
 ${OBJECTDIR}/hard.p1: hard.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/hard.p1.d 
@@ -126,30 +102,6 @@ ${OBJECTDIR}/hard.p1: hard.c  nbproject/Makefile-${CND_CONF}.mk
 	@${FIXDEPS} ${OBJECTDIR}/hard.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
 	
 else
-${OBJECTDIR}/sample.p1: sample.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/sample.p1.d 
-	@${RM} ${OBJECTDIR}/sample.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/sample.p1 sample.c 
-	@-${MV} ${OBJECTDIR}/sample.d ${OBJECTDIR}/sample.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/sample.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/basic.p1: basic.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/basic.p1.d 
-	@${RM} ${OBJECTDIR}/basic.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/basic.p1 basic.c 
-	@-${MV} ${OBJECTDIR}/basic.d ${OBJECTDIR}/basic.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/basic.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
-${OBJECTDIR}/advance.p1: advance.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}" 
-	@${RM} ${OBJECTDIR}/advance.p1.d 
-	@${RM} ${OBJECTDIR}/advance.p1 
-	${MP_CC} $(MP_EXTRA_CC_PRE) -mcpu=$(MP_PROCESSOR_OPTION) -c  -fno-short-double -fno-short-float -memi=wordwrite -O0 -fasmfile -maddrqual=ignore -xassembler-with-cpp -mwarn=-3 -Wa,-a -DXPRJ_default=$(CND_CONF)  -msummary=-psect,-class,+mem,-hex,-file  -ginhx032 -Wl,--data-init -mno-keep-startup -mno-download -mdefault-config-bits $(COMPARISON_BUILD)  -std=c99 -gdwarf-3 -mstack=compiled:auto:auto:auto     -o ${OBJECTDIR}/advance.p1 advance.c 
-	@-${MV} ${OBJECTDIR}/advance.d ${OBJECTDIR}/advance.p1.d 
-	@${FIXDEPS} ${OBJECTDIR}/advance.p1.d $(SILENT) -rsi ${MP_CC_DIR}../  
-	
 ${OBJECTDIR}/hard.p1: hard.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/hard.p1.d 
