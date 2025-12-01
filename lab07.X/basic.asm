@@ -57,8 +57,8 @@
 
     L1 EQU 0x14
     L2 EQU 0x15
-    CNT EQU 0x20 
-    STA EQU 0x21
+    CNT EQU 0x20		; 加減去控制亮燈順序
+    STA EQU 0x21		; 紀錄現在在 count up 還是 count down
     org 0x00
     
 DELAY macro num1, num2 
@@ -81,9 +81,6 @@ DELAY macro num1, num2
 	DECFSZ L2, 1
 	BRA LOOP2
 endm
-	
-; 程式邏輯：會一直卡在main裡面做無限迴圈，按下RB0的按鈕後會觸發interrupt，跳到ISR執行
-; ISR裡的內容會亮起所有在RA上的燈泡，Delay約0.5秒後熄滅。
 
 goto Initial			; 避免程式一開始就會執行到ISR這一段，要跳過。
 ISR:				; Interrupt發生時，會跳到這裡執行。
@@ -111,20 +108,20 @@ Initial:
     MOVLW 0x0F
     MOVWF ADCON1		; 設定成要用數位的方式，Digitial I/O 
     
-    CLRF TRISD
-    CLRF LATD
+    CLRF TRISD			; PORTD 8 根腳位全部都是 Output
+    CLRF LATD			; 現在輸出低電位 => LED 關燈
     CLRF CNT
     CLRF STA
-    BSF TRISB,  0
+    BSF TRISB,  0		; TRISB 的第 0 個 bit 設為 1 => RB0為input
     BCF RCON, IPEN
     BCF INTCON, INT0IF		; 先將Interrupt flag bit清空
     BSF INTCON, GIE		; 將Global interrupt enable bit打開
-    BSF INTCON, INT0IE		; 將interrupt0 enable bit 打開 (INT0與RB0 pin腳位置相同)
+    BSF INTCON, INT0IE		; 將interrupt0 enable bit 打開 (INT0與RB0 pin腳位置相同) (白話：開啟 INT0 中斷功能)
     
 main:
     MOVF CNT, W
     SWAPF WREG, W
-    MOVWF LATD
+    MOVWF LATD		; show at RD7~RD4
     
     DELAY d'111', d'125'	; 0.5s
     MOVF STA, W

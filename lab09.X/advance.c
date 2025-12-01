@@ -1,6 +1,6 @@
 #include <xc.h>
 #include <pic18f4520.h>
-#include <stdlib.h> // 用於 abs 函數 (選用)
+#include <stdlib.h> // 用於 abs 函數 
 
 #pragma config OSC = INTIO67 // Oscillator Selection bits
 #pragma config WDT = OFF     // Watchdog Timer Enable bit

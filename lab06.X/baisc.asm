@@ -22,20 +22,21 @@ DELAY macro num1, num2
     MOVLW num2          ; Load num2 into WREG
     MOVWF L2            ; Store WREG value into L2
     
+    ; PIC18F 只有 8 bit，只能數到 256，大概延遲 255 微秒根本沒感覺 => solution: 用兩層數到四萬多
     ; Total_cycles for LOOP2 = 2 cycles
     LOOP2:
-    MOVLW num1          
-    MOVWF L1  
-    
-    ; Total_cycles for LOOP1 = 8 cycles
-    LOOP1:
-    NOP                 ; busy waiting
-    NOP
-    NOP
-    NOP
-    NOP
-    DECFSZ L1, 1        
-    BRA LOOP1           ; BRA instruction spends 2 cycles
+	MOVLW num1          
+	MOVWF L1  
+
+	; Total_cycles for LOOP1 = 8 cycles
+	LOOP1:
+	NOP		    ; busy waiting (白話：發呆 5 cycle) 是方便我們計算的寫法
+	NOP
+	NOP
+	NOP
+	NOP
+	DECFSZ L1, 1	    ; DECFSZ takes 1 cycle 
+	BRA LOOP1	    ; BRA instruction spends 2 cycles
     
     ; 3 cycles
     DECFSZ L2, 1        ; Decrement L2, skip if zero
@@ -48,14 +49,14 @@ int:
     MOVLW 0x0f          ; Set ADCON1 register for digital mode
     MOVWF ADCON1        ; Store WREG value into ADCON1 register
     CLRF PORTB          ; Clear PORTB
-    BSF TRISB, 0        ; Set RB0 as input (TRISB = 0000 0001)
+    BSF TRISB, 0        ; Set RB0 as input (TRISB = 0000 0001) (bit = 1 => input)
     CLRF LATA           ; Clear LATA
-    BCF TRISA, 0        ; Set RA0 as output (TRISA = 0000 0000)
+    BCF TRISA, 0        ; Set RA0 as output (TRISA = 0000 0000) (bit = 0 => output)
     BCF TRISA, 1
     BCF TRISA, 2
     
 ; Button check
-check_process:          
+check_process:
     BTFSC PORTB, 0      ; Check if PORTB bit 0 is low (button pressed)
     BRA check_process   ; If button is not pressed, branch back to check_process
     BRA check_state         

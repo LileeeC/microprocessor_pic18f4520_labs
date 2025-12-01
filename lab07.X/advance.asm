@@ -56,8 +56,8 @@
   CONFIG  EBTRB = OFF           ; Boot Block Table Read Protection bit (Boot block (000000-0007FFh) not protected from table reads executed in other blocks)
 
   CNT EQU 0x20
-  DELAY1 EQU 0x21
-  SKIP EQU 0x22
+  DELAY1 EQU 0x21	    ; 判斷現在的delay多長
+  SKIP EQU 0x22		    ; 判斷0.5秒之後是否繼續亮著
   org 0x00
     
 goto Initial			    
@@ -87,7 +87,7 @@ Delay0.5:
     BCF DELAY1, 0	    ; mext round delay 0.5s
     BRA EndISR
 Skip:
-    BCF SKIP, 0		    ; 已經通過延遲一秒的前半秒，讓flag=0讓夏個半秒後會更新
+    BCF SKIP, 0		    ; 已經通過延遲一秒的前半秒，讓flag=0讓下個半秒後會更新
 EndISR:
     BCF PIR1, TMR2IF        ; 離開前記得把TMR2IF清空 (清空flag bit)
     RETFIE

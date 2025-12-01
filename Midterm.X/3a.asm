@@ -1,0 +1,26 @@
+List p=18f4520
+    #include<p18f4520.inc>
+	CONFIG OSC = INTIO67
+	CONFIG WDT = OFF
+	org 0x000
+
+    LFSR 0, 0x00
+    MOVLW 0x01
+    MOVWF POSTINC0
+    MOVLW 0x05
+    MOVWF POSTINC0
+    MOVLW 0x09
+    MOVWF POSTINC0
+    MOVLW 0x04
+    MOVWF POSTINC0
+    MOVLW 0x05
+    MOVWF POSTINC0
+    MOVLW 0x0A
+    MOVWF POSTINC0
+    LFSR 0, 0x00
+    
+    result EQU 0x10
+    
+    
+    
+END

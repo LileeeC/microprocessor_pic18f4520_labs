@@ -15,7 +15,7 @@ r0      EQU 0x20    ; result low byte
 r1      EQU 0x21
 r2      EQU 0x22
 r3      EQU 0x23    ; result high byte
-SIGN    EQU 0x30    ; 0=+, 1=negative
+SIGN    EQU 0x30    ; 0=positive, 1=negative
 tmpL    EQU 0x31
 tmpH    EQU 0x32
 
@@ -29,7 +29,7 @@ _mul_extended:
     CLRF    SIGN
 
     ; n < 0
-    BTFSS   aH, 7 ; check bit 15
+    BTFSS   aH, 7 ; check bit 15 (negative if == 1)
     BRA     chk_m
     COMF    aL, F
     COMF    aH, F
